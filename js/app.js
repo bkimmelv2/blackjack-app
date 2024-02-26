@@ -42,6 +42,9 @@ let hiddenCard = ""
 let playerValue = 0
 let dealerValue = 0
 
+let dealerHasAce = false
+let playerHasAce = false
+
 //MIGHT NOT NEED THIS AS THE returnCards FUNCTION ALSO SHUFFLES.
 // const shuffleDeck = () => {
 //     fetch(`https://www.deckofcardsapi.com/api/deck/54k6bqumtyhy/shuffle/?deck_count=1`)
@@ -73,19 +76,20 @@ const initDeal = () => {
     },
     (err) => {
         console.log(err)
-    }).then((json) => {
+    })
+    .then((json) => {
         console.log(json)
         // this will store the hidden card's actual image for later use.
         hiddenCard = json.cards[1].image
         console.log(hiddenCard)
 
         // creating img elements to store the card faces
-        let dealerCard1 = document.getElementById('hiddenCard')
-        let dealerCard2 = document.getElementById('dCard2')
-        let playerCard1 = document.getElementById('pCard1')
-        let playerCard2 = document.getElementById('pCard2')
-        let playerDiv = document.getElementById('player')
-        let dealerDiv = document.getElementById('dealer')
+        const dealerCard1 = document.getElementById('hiddenCard')
+        const dealerCard2 = document.getElementById('dCard2')
+        const playerCard1 = document.getElementById('pCard1')
+        const playerCard2 = document.getElementById('pCard2')
+        const playerDiv = document.getElementById('player')
+        const dealerDiv = document.getElementById('dealer')
 
         // change img src to corresponding card face
         playerCard1.src = json.cards[0].image
@@ -98,9 +102,18 @@ const initDeal = () => {
             if (json.cards[i].value === 'JACK' || json.cards[i].value === 'QUEEN' || json.cards[i].value === 'KING') {
                 json.cards[i].value = '10'
             } else if (json.cards[i].value === 'ACE') {
-                json.cards[i].value = '11'
+                // added logic to track if player or dealer has an ace
+                if (i % 2 === 0) {
+                    playerHasAce = true
+                    json.cards[i].value = '11'
+                } else {
+                    dealerHasAce = true
+                    json.cards[i].value = '11'
+                }
             }
         }
+
+        console.log(playerHasAce, dealerHasAce)
 
         // add the value data to the player and dealer variables to use in later logic
         playerValue = Number(json.cards[0].value) + Number(json.cards[2].value)
@@ -116,16 +129,23 @@ const initDeal = () => {
         // check for a natural blackjack, using a setTimeout so the cards appear on screen first.
         setTimeout(() => {
             if (playerValue === 21 && dealerValue === 21) {
-            alert('It\'s a tie! Both dealer and player have been dealt Blackjack. Use the Reset Game button to play again!')
+            alert('It\'s a tie! Both dealer and player have been dealt Blackjack.')
             dealerCard1.src = hiddenCard
+            // making the next choice easier for the user by hiding all other buttons
+            document.getElementById('hit').style.visibility = 'hidden'
+            document.getElementById('stand').style.visibility = 'hidden'
             } else if (playerValue === 21) {
-                alert('WINNER WINNER CHICKEN DINNER!!! Use the Reset Game button to play again!')
+                alert('WINNER WINNER CHICKEN DINNER!!!')
                 dealerCard1.src = hiddenCard
+                document.getElementById('hit').style.visibility = 'hidden'
+                document.getElementById('stand').style.visibility = 'hidden'
             } else if (dealerValue === 21) {
-                alert('Natural Dealer Blackjack detected... revealing cards. Use the Reset Game button to play again!')
+                alert('Natural Dealer Blackjack detected... revealing cards. You lose!')
                 dealerCard1.src = hiddenCard
+                document.getElementById('hit').style.visibility = 'hidden'
+                document.getElementById('stand').style.visibility = 'hidden'
             }
-        }, 750)
+        }, 500)
     },
     (err) => {
         console.log(err)
@@ -147,3 +167,59 @@ resetButton.addEventListener('click', () => {
     history.go(0) // this will ensure any added elements are removed and the HTML resets to it's original layout
 })
 
+const hitMeButton = document.getElementById('hit')
+hitMeButton.addEventListener('click', () => {
+    fetch('https://www.deckofcardsapi.com/api/deck/54k6bqumtyhy/draw/?count=1')
+    .then((data) => {
+        return data.json()
+    },
+    (err) => {
+        console.log(err)
+    })
+    .then((json) => {
+        console.log(json)
+
+        // this pulls the card image and adds it to player's hand
+        const newCard = document.createElement('img')
+        const playerDiv = document.getElementById('player')
+        newCard.src = json.cards[0].image
+        playerDiv.appendChild(newCard)
+
+        // need to track the card's added value
+        if (json.cards[0].value === 'JACK' || json.cards[0].value === 'QUEEN' || json.cards[0].value === 'KING') {
+            json.cards[0].value = '10'
+        } else if (json.cards[0].value === 'ACE') {
+            playerHasAce = true
+            json.cards[0].value = '11'
+        }
+
+        playerValue += Number(json.cards[0].value)
+        console.log(playerValue)
+        
+        // now we need logic to detect if the playerValue should be reduced given playerHasAce is true.
+        if (playerValue > 21 && playerHasAce) {
+            playerValue -= 10
+            console.log(playerValue)
+        }
+
+        const dealerCard1 = document.getElementById('hiddenCard')
+
+        // need logic to check for bust or for blackjack win. Adding a delay so playerValue has time to update.
+        setTimeout(() => {
+            if (playerValue === 21) {
+            alert('WINNER WINNER CHICKEN DINNER!!!')
+            dealerCard1.src = hiddenCard
+            document.getElementById('hit').style.visibility = 'hidden'
+            document.getElementById('stand').style.visibility = 'hidden'
+            } else if (playerValue > 21) {
+            alert('BUST! You lose.')
+            dealerCard1.src = hiddenCard
+            document.getElementById('hit').style.visibility = 'hidden'
+            document.getElementById('stand').style.visibility = 'hidden'
+            }
+        }, 500)
+    },
+    (err) => {
+        console.log(err)
+    })
+})
