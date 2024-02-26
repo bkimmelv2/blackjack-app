@@ -37,8 +37,10 @@
 // newDeck()
 // DECK ID = 54k6bqumtyhy
 
-let playerHand = []
-let dealerHand = []
+let hiddenCard = ""
+
+let playerValue = 0
+let dealerValue = 0
 
 //MIGHT NOT NEED THIS AS THE returnCards FUNCTION ALSO SHUFFLES.
 // const shuffleDeck = () => {
@@ -57,6 +59,13 @@ let dealerHand = []
 //     })
 // }
 
+const returnCards = () => {
+    fetch('https://www.deckofcardsapi.com/api/deck/54k6bqumtyhy/return/')
+    alert('Cards are shuffled and dealt...')
+}
+
+// returnCards()
+
 const initDeal = () => {
     fetch('https://www.deckofcardsapi.com/api/deck/54k6bqumtyhy/draw/?count=4')
     .then((data) => {
@@ -66,46 +75,75 @@ const initDeal = () => {
         console.log(err)
     }).then((json) => {
         console.log(json)
-        playerHand.push(json.cards[0].image)
-        dealerHand.push(json.cards[1].image)
-        playerHand.push(json.cards[2].image)
-        dealerHand.push(json.cards[3].image)
+        // this will store the hidden card's actual image for later use.
+        hiddenCard = json.cards[1].image
+        console.log(hiddenCard)
 
-        let dealerCard1 = document.createElement('img')
-        let dealerCard2 = document.createElement('img')
-        let playerCard1 = document.createElement('img')
-        let playerCard2 = document.createElement('img')
+        // creating img elements to store the card faces
+        let dealerCard1 = document.getElementById('hiddenCard')
+        let dealerCard2 = document.getElementById('dCard2')
+        let playerCard1 = document.getElementById('pCard1')
+        let playerCard2 = document.getElementById('pCard2')
         let playerDiv = document.getElementById('player')
         let dealerDiv = document.getElementById('dealer')
 
-        playerCard1.src = playerHand[0]
-        playerCard2.src = playerHand[1]
-        dealerCard1.src = 'https://www.deckofcardsapi.com/static/img/back.png'
-        dealerCard2.src = dealerHand[1]
+        // change img src to corresponding card face
+        playerCard1.src = json.cards[0].image
+        playerCard2.src = json.cards[2].image
+        dealerCard1.src = 'https://www.deckofcardsapi.com/static/img/back.png' // Facedown card
+        dealerCard2.src = json.cards[3].image
 
+        // this will convert values if they are face cards
+        for (let i in json.cards) {
+            if (json.cards[i].value === 'JACK' || json.cards[i].value === 'QUEEN' || json.cards[i].value === 'KING') {
+                json.cards[i].value = '10'
+            } else if (json.cards[i].value === 'ACE') {
+                json.cards[i].value = '11'
+            }
+        }
+
+        // add the value data to the player and dealer variables to use in later logic
+        playerValue = Number(json.cards[0].value) + Number(json.cards[2].value)
+        dealerValue = Number(json.cards[1].value) + Number(json.cards[3].value)
+        console.log(playerValue, dealerValue)
+
+        // append to the corresponding divs
         playerDiv.appendChild(playerCard1)
         playerDiv.appendChild(playerCard2)
         dealerDiv.appendChild(dealerCard1)
         dealerDiv.appendChild(dealerCard2)
+
+        // check for a natural blackjack, using a setTimeout so the cards appear on screen first.
+        setTimeout(() => {
+            if (playerValue === 21 && dealerValue === 21) {
+            alert('It\'s a tie! Both dealer and player have been dealt Blackjack. Use the Reset Game button to play again!')
+            dealerCard1.src = hiddenCard
+            } else if (playerValue === 21) {
+                alert('WINNER WINNER CHICKEN DINNER!!! Use the Reset Game button to play again!')
+                dealerCard1.src = hiddenCard
+            } else if (dealerValue === 21) {
+                alert('Natural Dealer Blackjack detected... revealing cards. Use the Reset Game button to play again!')
+                dealerCard1.src = hiddenCard
+            }
+        }, 750)
     },
     (err) => {
         console.log(err)
     })
 }
-// drawCard()
-
-const returnCards = () => {
-    fetch('https://www.deckofcardsapi.com/api/deck/54k6bqumtyhy/return/')
-    alert('Cards returned and shuffled')
-}
-
-// returnCards()
 
 const startGame = () => {
-    if (playerHand.length === 0 && dealerHand.length === 0) {
-        initDeal()
-        console.log(playerHand, dealerHand)
-    }
+    alert('Welcome to Blackjack!')
+    returnCards()
+    initDeal()
 }
 
-// startGame()
+startGame()
+
+// Now we start writing functions for each button available to the user
+
+const resetButton = document.getElementById('reset')
+resetButton.addEventListener('click', () => {
+    history.go(0) // this will ensure any added elements are removed and the HTML resets to it's original layout
+})
+
