@@ -26,7 +26,7 @@ Using the value of the playerHasAce and dealerHasAce variables I was able to add
 ### Installing
 
 * Head over to the link below and the game should begin running!
-* <a href="https://a-game-of-blackjack.netlify.app/"></a>
+* [A Game of Blackjack](https://a-game-of-blackjack.netlify.app/)
 
 ## Help
 
