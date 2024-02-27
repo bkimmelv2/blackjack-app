@@ -33,3 +33,7 @@ Using the value of the playerHasAce and dealerHasAce variables I was able to add
 ## Help
 
 If any errors or bugs occur, please use the RESET GAME button.
+
+## Resources
+
+This program was built using resources pulled from the [DeckofCardsAPI](https://www.deckofcardsapi.com/)
