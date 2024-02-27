@@ -4,6 +4,8 @@ This is a game app design to allow the user to play a game of Blackjack against 
 
 ## Description
 
+HOW TO PLAY: The goal of the game is to get a hand as close to 21 without going over, while also beating out the dealer! Face cards are worth 10 and Aces are worth 11 or 1. Dealer will always stand at 17 or more (even if they have an Ace). Get 21 exactly and that's blackjack (instant win)!
+
 What's really special about the design of this game is that it uses a virtual 52 card deck, sourced from DeckofCardsAPI. This means that each game feels unique and is very similar to playing with a real deck of cards.
 
 The game is user-friendly and simple to play, give it a go!
