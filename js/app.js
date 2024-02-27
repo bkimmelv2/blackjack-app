@@ -15,7 +15,7 @@
     // Computer will use the Hit Me! function when hand value is less than 17.
     // otherwise, the game's results are read after evaluation.
 
-// Reset function is tied to a button. Pressing it will exec the returnCards function then the initDeal function.
+// Reset function is tied to a button. Pressing it will reset the page.
 
 
 // This function will generate a new deck for us to use.
@@ -69,6 +69,7 @@ const returnCards = () => {
 
 // returnCards()
 
+// INITAL DEAL WHEN THE PAGE LOADS //
 const initDeal = () => {
     fetch('https://www.deckofcardsapi.com/api/deck/54k6bqumtyhy/draw/?count=4')
     .then((data) => {
@@ -118,6 +119,12 @@ const initDeal = () => {
         // add the value data to the player and dealer variables to use in later logic
         playerValue = Number(json.cards[0].value) + Number(json.cards[2].value)
         dealerValue = Number(json.cards[1].value) + Number(json.cards[3].value)
+        // This covers the possibility of being dealt two Aces off the start
+        if (playerValue > 21 && playerHasAce) {
+            playerValue -= 10
+        } else if (dealerValue > 21 && dealerHasAce) {
+            dealerValue -= 10
+        }
         console.log(playerValue, dealerValue)
 
         // append to the corresponding divs
@@ -136,7 +143,7 @@ const initDeal = () => {
             document.getElementById('stand').style.visibility = 'hidden'
             } else if (playerValue === 21) {
                 alert('WINNER WINNER CHICKEN DINNER!!!')
-                dealerCard1.src = hiddenCard
+                dealerCard1.src = hiddenCard // reveal the hidden card
                 document.getElementById('hit').style.visibility = 'hidden'
                 document.getElementById('stand').style.visibility = 'hidden'
             } else if (dealerValue === 21) {
@@ -151,7 +158,9 @@ const initDeal = () => {
         console.log(err)
     })
 }
+// // // // // //
 
+// MANUALLY CALLED START FUNCTION //
 const startGame = () => {
     alert('Welcome to Blackjack!')
     returnCards()
@@ -159,14 +168,18 @@ const startGame = () => {
 }
 
 startGame()
+// // // // // //
 
 // Now we start writing functions for each button available to the user
 
+// RESET BUTTON //
 const resetButton = document.getElementById('reset')
 resetButton.addEventListener('click', () => {
     history.go(0) // this will ensure any added elements are removed and the HTML resets to it's original layout
 })
+// // // // // //
 
+// HIT ME BUTTON //
 const hitMeButton = document.getElementById('hit')
 hitMeButton.addEventListener('click', () => {
     fetch('https://www.deckofcardsapi.com/api/deck/54k6bqumtyhy/draw/?count=1')
@@ -198,6 +211,7 @@ hitMeButton.addEventListener('click', () => {
         
         // now we need logic to detect if the playerValue should be reduced given playerHasAce is true.
         if (playerValue > 21 && playerHasAce) {
+            playerHasAce = false
             playerValue -= 10
             console.log(playerValue)
         }
@@ -223,3 +237,112 @@ hitMeButton.addEventListener('click', () => {
         console.log(err)
     })
 })
+// // // // // //
+
+// COMPARE SCORE FUNCTION //
+const compareScore = () => {
+    if (dealerValue >= 17 && dealerValue < 21) {
+        // COMPARE VALUE FUNCTION
+        alert('Dealer stands...')
+        if (playerValue > dealerValue) {
+            alert(`Player has won! Player's hand of ${playerValue} beats dealer's hand of ${dealerValue}`)
+            document.getElementById('hit').style.visibility = 'hidden'
+            document.getElementById('stand').style.visibility = 'hidden'
+        } else if (playerValue < dealerValue) {
+            alert(`Dealer has won! Player's hand of ${playerValue} loses to dealer's hand of ${dealerValue}`)
+            document.getElementById('hit').style.visibility = 'hidden'
+            document.getElementById('stand').style.visibility = 'hidden'
+        } else {
+            alert(`Player and dealer have tied, each with hands of ${playerValue}`)
+            document.getElementById('hit').style.visibility = 'hidden'
+            document.getElementById('stand').style.visibility = 'hidden'
+        }
+    // dealer wins on 21
+    } else if (dealerValue === 21) {
+        // DEALER WINS FUNCTION
+        alert(`Dealer has Blackjack! You lose.`)
+        document.getElementById('hit').style.visibility = 'hidden'
+        document.getElementById('stand').style.visibility = 'hidden'
+    // dealer busts if above 21
+    } else {
+        // DEALER BUSTS FUNCTION
+        alert(`Dealer has busted! Player wins with a hand of ${playerValue}`)
+        document.getElementById('hit').style.visibility = 'hidden'
+        document.getElementById('stand').style.visibility = 'hidden'
+    }
+}
+// // // // // //
+
+// STAND BUTTON (Computer's moves) //
+const standButton = document.getElementById('stand')
+standButton.addEventListener('click', () => {
+    // first we need to reveal the dealer's hidden card
+    const dealerCard1 = document.getElementById('hiddenCard')
+    dealerCard1.src = hiddenCard
+
+    // setting everything after the card reveal on a delay
+    setTimeout(() => {
+        // adding a delay between each loop iteration by using the for loop that runs below this task function
+        const task = (i) => {
+            setTimeout(() => {
+                // dealer will hit until the hand is >= 17
+                if (dealerValue < 17) {
+                    fetch('https://www.deckofcardsapi.com/api/deck/54k6bqumtyhy/draw/?count=1')
+                    .then((data) => {
+                        return data.json()
+                    },
+                    (err) => {
+                        console.log(err)
+                    })
+                    .then((json) => {
+                        console.log(json)
+
+                        // this pulls the card image and adds it to dealer's hand
+                        const newCard = document.createElement('img')
+                        const dealerDiv = document.getElementById('dealer')
+                        newCard.src = json.cards[0].image
+                        dealerDiv.appendChild(newCard)
+
+                        // now we track/update the dealerValue
+                        if (json.cards[0].value === 'JACK' || json.cards[0].value === 'QUEEN' || json.cards[0].value === 'KING') {
+                            json.cards[0].value = '10'
+                        } else if (json.cards[0].value === 'ACE') {
+                            dealerHasAce = true
+                            json.cards[0].value = '11'
+                        }
+
+                        dealerValue += Number(json.cards[0].value)
+                        console.log(dealerValue)
+
+                        // Here is our Ace check from before, modded for dealer to use
+                        if (dealerValue > 21 && dealerHasAce) {
+                            dealerHasAce = false
+                            dealerValue -= 10
+                            console.log(dealerValue)
+                        }
+                        
+                    },
+                    (err) => {
+                        console.log(err)
+                    })
+                }
+            }, 1350 * i)
+        }
+
+        // adding a loop that will run 5 times max. Average blackjack round deals 3-4 cards.
+        for (let i = 0; i < 5; i++) {
+            // loop will end early if dealer's initial cards are >= 17
+            if (dealerValue >= 17){
+                compareScore()
+                break
+            } else {
+                task(i)
+            }
+        }
+
+        setTimeout(() => {
+            compareScore()
+        }, 3750)
+    }, 1000)
+})
+// // // // // //
