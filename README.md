@@ -1,6 +1,6 @@
 # A Game of Blackjack
 
-This is a game app design to allow the user to play a game of Blackjack against a computer controlled dealer.
+This is a game app designed to allow the user to play a game of Blackjack against a computer controlled dealer.
 
 ## Description
 
