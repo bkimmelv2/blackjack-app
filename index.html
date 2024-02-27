@@ -2,29 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=640, initial-scale=1.0">
     <title>Blackjack</title>
     <link rel="stylesheet" href="css/style.css">
     <script src="js/app.js" defer></script>
 </head>
 <body>
-    <h1>A Simple Game of Blackjack</h1>
+    <h1>A Game of Blackjack</h1>
+
+    <h2>Dealer's Hand</h2>
     <div id="dealer">
-        <h2>Dealer's Hand</h2>
         <img src="" id="hiddenCard">
         <img src="" id="dCard2">
 
     </div>
+
+    <h2>Player's Hand</h2>
     <div id="player">
-        <h2>Player's Hand</h2>
         <img src="" id="pCard1">
         <img src="" id="pCard2">
 
     </div>
     <footer>
-        <button id="hit">Hit Me!</button>
-        <button id="stand">Stand</button>
-        <button id="reset" title="Tip: This button will reset the game if you want to play again!">Reset Game</button>
+        <h3 id="status">Welcome to Blackjack! Make your decision below...</h3>
+        <div id="buttons">
+            <button id="hit" title="Tip: Hit when your hand is 16 or below and the dealer has at least a 7.">Hit Me!</button>
+            <button id="stand" title="Tip: Stand when you have more than 16 in your hand and the dealer's hand is low.">Stand</button>
+            <button id="reset" title="Tip: This button will reset the game if you want to play again!">Reset Game</button>
+        </div>
     </footer>
 </body>
 </html>

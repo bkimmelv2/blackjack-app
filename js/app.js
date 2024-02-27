@@ -135,19 +135,24 @@ const initDeal = () => {
 
         // check for a natural blackjack, using a setTimeout so the cards appear on screen first.
         setTimeout(() => {
+            const status = document.getElementById('status')
+
             if (playerValue === 21 && dealerValue === 21) {
-            alert('It\'s a tie! Both dealer and player have been dealt Blackjack.')
+            status.innerText = 'It\'s a tie! Both dealer and player have been dealt Blackjack.'
+            // alert('It\'s a tie! Both dealer and player have been dealt Blackjack.')
             dealerCard1.src = hiddenCard
             // making the next choice easier for the user by hiding all other buttons
             document.getElementById('hit').style.visibility = 'hidden'
             document.getElementById('stand').style.visibility = 'hidden'
             } else if (playerValue === 21) {
-                alert('WINNER WINNER CHICKEN DINNER!!!')
+                status.innerText = 'WINNER WINNER CHICKEN DINNER!!!'
+                // alert('WINNER WINNER CHICKEN DINNER!!!')
                 dealerCard1.src = hiddenCard // reveal the hidden card
                 document.getElementById('hit').style.visibility = 'hidden'
                 document.getElementById('stand').style.visibility = 'hidden'
             } else if (dealerValue === 21) {
-                alert('Natural Dealer Blackjack detected... revealing cards. You lose!')
+                status.innerText = 'Natural Dealer Blackjack detected... revealing cards. You lose!'
+                // alert('Natural Dealer Blackjack detected... revealing cards. You lose!')
                 dealerCard1.src = hiddenCard
                 document.getElementById('hit').style.visibility = 'hidden'
                 document.getElementById('stand').style.visibility = 'hidden'
@@ -162,7 +167,6 @@ const initDeal = () => {
 
 // MANUALLY CALLED START FUNCTION //
 const startGame = () => {
-    alert('Welcome to Blackjack!')
     returnCards()
     initDeal()
 }
@@ -220,13 +224,17 @@ hitMeButton.addEventListener('click', () => {
 
         // need logic to check for bust or for blackjack win. Adding a delay so playerValue has time to update.
         setTimeout(() => {
+            const status = document.getElementById('status')
+
             if (playerValue === 21) {
-            alert('WINNER WINNER CHICKEN DINNER!!!')
+            status.innerText = 'WINNER WINNER CHICKEN DINNER!!!'
+            // alert('WINNER WINNER CHICKEN DINNER!!!')
             dealerCard1.src = hiddenCard
             document.getElementById('hit').style.visibility = 'hidden'
             document.getElementById('stand').style.visibility = 'hidden'
             } else if (playerValue > 21) {
-            alert('BUST! You lose.')
+            status.innerText = 'BUST! You lose.'
+            // alert('BUST! You lose.')
             dealerCard1.src = hiddenCard
             document.getElementById('hit').style.visibility = 'hidden'
             document.getElementById('stand').style.visibility = 'hidden'
@@ -241,32 +249,38 @@ hitMeButton.addEventListener('click', () => {
 
 // COMPARE SCORE FUNCTION //
 const compareScore = () => {
+    const status = document.getElementById('status')
     if (dealerValue >= 17 && dealerValue < 21) {
         // COMPARE VALUE FUNCTION
         alert('Dealer stands...')
         if (playerValue > dealerValue) {
-            alert(`Player has won! Player's hand of ${playerValue} beats dealer's hand of ${dealerValue}`)
+            status.innerText = `Player has won! Player's hand of ${playerValue} beats dealer's hand of ${dealerValue}`
+            // alert(`Player has won! Player's hand of ${playerValue} beats dealer's hand of ${dealerValue}`)
             document.getElementById('hit').style.visibility = 'hidden'
             document.getElementById('stand').style.visibility = 'hidden'
         } else if (playerValue < dealerValue) {
-            alert(`Dealer has won! Player's hand of ${playerValue} loses to dealer's hand of ${dealerValue}`)
+            status.innerText = `Dealer has won! Player's hand of ${playerValue} loses to dealer's hand of ${dealerValue}`
+            // alert(`Dealer has won! Player's hand of ${playerValue} loses to dealer's hand of ${dealerValue}`)
             document.getElementById('hit').style.visibility = 'hidden'
             document.getElementById('stand').style.visibility = 'hidden'
         } else {
-            alert(`Player and dealer have tied, each with hands of ${playerValue}`)
+            status.innerText = `Player and dealer have tied, each with hands of ${playerValue}`
+            // alert(`Player and dealer have tied, each with hands of ${playerValue}`)
             document.getElementById('hit').style.visibility = 'hidden'
             document.getElementById('stand').style.visibility = 'hidden'
         }
     // dealer wins on 21
     } else if (dealerValue === 21) {
         // DEALER WINS FUNCTION
-        alert(`Dealer has Blackjack! You lose.`)
+        status.innerText = `Dealer has Blackjack! You lose.`
+        // alert(`Dealer has Blackjack! You lose.`)
         document.getElementById('hit').style.visibility = 'hidden'
         document.getElementById('stand').style.visibility = 'hidden'
     // dealer busts if above 21
     } else {
         // DEALER BUSTS FUNCTION
-        alert(`Dealer has busted! Player wins with a hand of ${playerValue}`)
+        status.innerText = `Dealer has busted! Player wins with a hand of ${playerValue}`
+        // alert(`Dealer has busted! Player wins with a hand of ${playerValue}`)
         document.getElementById('hit').style.visibility = 'hidden'
         document.getElementById('stand').style.visibility = 'hidden'
     }
@@ -279,6 +293,8 @@ standButton.addEventListener('click', () => {
     // first we need to reveal the dealer's hidden card
     const dealerCard1 = document.getElementById('hiddenCard')
     dealerCard1.src = hiddenCard
+    const status = document.getElementById('status')
+    status.innerText = 'Dealer is thinking...'
 
     // setting everything after the card reveal on a delay
     setTimeout(() => {
@@ -329,6 +345,7 @@ standButton.addEventListener('click', () => {
             }, 1350 * i)
         }
 
+        let loopHasRun = false
         // adding a loop that will run 5 times max. Average blackjack round deals 3-4 cards.
         for (let i = 0; i < 5; i++) {
             // loop will end early if dealer's initial cards are >= 17
@@ -337,11 +354,14 @@ standButton.addEventListener('click', () => {
                 break
             } else {
                 task(i)
+                loopHasRun = true
             }
         }
 
         setTimeout(() => {
+            if (loopHasRun) {
             compareScore()
+            }
         }, 3750)
     }, 1000)
 })
