@@ -63,7 +63,7 @@ let playerHasAce = false
 // }
 
 const returnCards = () => {
-    fetch('https://www.deckofcardsapi.com/api/deck/2v2c8z8dl9ss/return/')
+    fetch('https://www.deckofcardsapi.com/api/deck/7ey44xsvv49y/return/')
     alert('Cards are shuffled and dealt...')
 }
 
@@ -71,7 +71,7 @@ const returnCards = () => {
 
 // INITAL DEAL WHEN THE PAGE LOADS //
 const initDeal = () => {
-    fetch('https://www.deckofcardsapi.com/api/deck/2v2c8z8dl9ss/draw/?count=4')
+    fetch('https://www.deckofcardsapi.com/api/deck/7ey44xsvv49y/draw/?count=4')
     .then((data) => {
         return data.json()
     },
@@ -186,7 +186,7 @@ resetButton.addEventListener('click', () => {
 // HIT ME BUTTON //
 const hitMeButton = document.getElementById('hit')
 hitMeButton.addEventListener('click', () => {
-    fetch('https://www.deckofcardsapi.com/api/deck/2v2c8z8dl9ss/draw/?count=1')
+    fetch('https://www.deckofcardsapi.com/api/deck/7ey44xsvv49y/draw/?count=1')
     .then((data) => {
         return data.json()
     },
@@ -303,7 +303,7 @@ standButton.addEventListener('click', () => {
             setTimeout(() => {
                 // dealer will hit until the hand is >= 17
                 if (dealerValue < 17) {
-                    fetch('https://www.deckofcardsapi.com/api/deck/2v2c8z8dl9ss/draw/?count=1')
+                    fetch('https://www.deckofcardsapi.com/api/deck/7ey44xsvv49y/draw/?count=1')
                     .then((data) => {
                         return data.json()
                     },
